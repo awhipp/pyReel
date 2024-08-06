@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pyThor"
+version = "0.1.0"
+description = "pyThor is a Python CLI and service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file."
+authors = ["awhipp"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ffmpeg-python = "^0.2.0"
+pydantic = "^2.8.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

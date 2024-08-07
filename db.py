@@ -23,49 +23,103 @@ class Connector():
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS files (
-                file_name TEXT NOT NULL,
-                initial_file_size INTEGER NOT NULL,
-                file_extension TEXT,
+                file_name TEXT,
                 file_path TEXT PRIMARY KEY,
-                final_file_size INTEGER
+                initial_size INTEGER,
+                current_size INTEGER,
+                is_deleted BOOLEAN DEFAULT 0,
+                is_converted BOOLEAN DEFAULT 0
             )
             """
         )
         self.conn.commit()
     
-    def add_file_metadata(self, file: FileMetadata):
-        """Adds the file metadata to the database, updates it if it collides."""
+    def add_file_metadata_if_not_exists(self, file: FileMetadata):
+        """Adds the file metadata to the database, ignores it if it collides."""
         self.cursor.execute(
             """
-            INSERT OR REPLACE INTO files
-            (file_name, initial_file_size, file_extension, file_path, final_file_size)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO files
+            (file_name, file_path, initial_size, current_size)
+            VALUES (?, ?, ?, ?)
             """,
-            (file.file_name, file.initial_file_size, file.file_extension, file.file_path, file.final_file_size)
+            (file.file_name, file.file_path, file.initial_size, file.current_size)
         )
-        self.conn.commit()
-        
-    def update_file_metadata(self, file: FileMetadata):
-        """Updates the file metadata in the database."""
+        self.conn.commit()   
+
+    def update_file_size(self, file_path: str, current_size: int):
+        """Updates the current size of the file in the database."""
         self.cursor.execute(
             """
             UPDATE files
-            SET final_file_size = ?
+            SET current_size = ?
             WHERE file_path = ?
             """,
-            (file.final_file_size, file.file_path)
+            (current_size, file_path)
         )
-        self.conn.commit()
-    
+        self.conn.commit()   
+
+    def update_file_path(self, old_file_path: str, new_file_path: str):
+        """Updates the file path in the database."""
+        file_name = os.path.basename(new_file_path)
+        self.cursor.execute(
+            """
+            UPDATE files
+            SET file_name = ?, file_path = ?
+            WHERE file_path = ?
+            """,
+            (file_name, new_file_path, old_file_path)
+        )
+        self.conn.commit()   
+
+    def set_file_converted(self, file_path: str, converted: bool = True):
+        """Sets the file as converted in the database."""
+        print(f"Setting {file_path} as converted: {converted}")
+        self.cursor.execute(
+            """
+            UPDATE files
+            SET is_converted = ?
+            WHERE file_path = ?
+            """,
+            (converted, file_path)
+        )
+        self.conn.commit()  
+
+    def is_file_converted(self, file_path: str):
+        """Checks if the file is already converted."""
+        self.cursor.execute(
+            """
+            SELECT is_converted
+            FROM files
+            WHERE file_path = ?
+            """,
+            (file_path,)
+        )
+        is_converted = self.cursor.fetchone()[0]
+        return is_converted
+
+    def set_file_deleted(self, file_path: str, deleted: bool = True):
+        """Sets the file as deleted in the database."""
+        self.cursor.execute(
+            """
+            UPDATE files
+            SET is_deleted = ?
+            WHERE file_path = ?
+            """,
+            (deleted, file_path)
+        )
+        self.conn.commit()   
+
     def optimize_and_vacuum(self):
         """Optimizes the database and reclaims the space."""
         self.cursor.execute("VACUUM")
-        self.conn.commit()
+        self.conn.commit()   
 
     def get_all_files(self):
         """Returns all the files from the database."""
         self.cursor.execute("SELECT * FROM files")
         rows = self.cursor.fetchall()
+        # Convert the rows to FileMetadata objects (using column names)
+        rows = [FileMetadata(**dict(zip([column[0] for column in self.cursor.description], row))) for row in rows]
         return rows
     
     def file_count(self):
@@ -76,45 +130,17 @@ class Connector():
 
     def file_size_saved(self):
         """Returns the total file size saved by the conversion."""
-        self.cursor.execute("SELECT SUM(initial_file_size - final_file_size) FROM files")
+        self.cursor.execute("SELECT SUM(initial_size - current_size) FROM files")
         saved = self.cursor.fetchone()[0]
         return saved
     
     def percentage_saved(self):
         """Returns the percentage of space saved by the conversion."""
         saved = self.file_size_saved()
-        self.cursor.execute("SELECT SUM(initial_file_size) FROM files")
+        self.cursor.execute("SELECT SUM(initial_size) FROM files")
         total = self.cursor.fetchone()[0]
         return (saved / total) * 100
 
     def close(self):
         """Closes the database connection."""
         self.conn.close()
-
-
-if __name__ == "__main__":
-    from scan import ScanDirectory
-
-    # Create a connector object
-    connector = Connector("files.db")
-    
-    # Add files to the database
-    scanner = ScanDirectory(root_dir=".")
-    for file in scanner.files:
-        connector.add_file_metadata(file)
-
-    # Optimize
-    connector.optimize_and_vacuum()
-    
-    # Get all files from the database
-    files = connector.get_all_files()
-    for file in files:
-        print(file)
-
-    # Stats
-    print(f"Total files: {connector.file_count()}")
-    print(f"Total size saved: {connector.file_size_saved()} bytes")
-    print(f"Percentage saved: {connector.percentage_saved()}%")
-    
-    # Close the connection
-    connector.close()

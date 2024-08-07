@@ -9,8 +9,8 @@ import logging
 import ffmpeg
 
 from pydantic import BaseModel
+from models import FileMetadata
 
-# Set up logging to add timestamps to the output
 # Set up logging to add timestamps to the output
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,6 +20,8 @@ class VideoProcessor(BaseModel):
     input_size: int = 0
     output_file: str = ""
     output_size: int = 0
+    processed: bool = False
+    converted: bool = False
 
     def __init__(self, input_file: str):
         """Post-initialization to set up additional attributes."""
@@ -36,7 +38,7 @@ class VideoProcessor(BaseModel):
                 self.input_file
             ).output(
                 self.output_file, vcodec='libx265', crf=28
-            ).run(overwrite_output=True)
+            ).run(overwrite_output=True, quiet=True)
             return True
         except ffmpeg.Error as e:
             logger.info(f"Error occurred: {e}")
@@ -54,15 +56,17 @@ class VideoProcessor(BaseModel):
         self.output_size = os.path.getsize(self.output_file)
 
         if self.output_size < self.input_size:
-            os.replace(self.output_file, self.input_file)
+            os.remove(self.input_file)
+            new_output_file = self.output_file.replace('.temp.mkv', '.mkv')
+            os.rename(self.output_file, new_output_file)
+            self.output_file = new_output_file
             print(f"Replaced {self.input_file} with the smaller {self.output_file}")
+            self.processed = True
+            self.converted = True
         else:
             os.remove(self.output_file)
             print(f"Retained original {self.input_file}, new file {self.output_file} is not smaller")
-            
-        input_size_gb = self.input_size / (1024 * 1024 * 1024)
-        output_size_gb = self.output_size / (1024 * 1024 * 1024)
-        print(f"-- Original size: {input_size_gb}gb, New size: {output_size_gb}gb")
+            self.processed = True
 
     def process(self):
         """Converts the video file to H.265 format and replaces the original file if the new file is smaller.
@@ -70,20 +74,19 @@ class VideoProcessor(BaseModel):
         Args:
             file_path (str): Path to the video file.
         """
-        if self.convert_to_h265():
-            self.compare_and_replace()
-        else:
-            if os.path.exists(self.output_file):
-                os.remove(self.output_file)
-            print(f"Failed to convert {self.input_file}")
+        try:
+            if self.convert_to_h265():
+                self.compare_and_replace()
+            else:
+                if os.path.exists(self.output_file):
+                    os.remove(self.output_file)
+                print(f"Failed to convert {self.input_file}")
+        except Exception as e:
+            print(f"Failed to convert {self.input_file}: {e}")
+            self.output_size = self.input_size
 
-    def to_dict(self):
-        return {
-            "input_file": self.input_file,
-            "input_size": self.input_size,
-            "output_file": self.output_file,
-            "output_size": self.output_size
-        }
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -92,4 +95,4 @@ if __name__ == "__main__":
         video_file = sys.argv[1]
         processor = VideoProcessor(input_file=video_file)
         processor.process()
-        logger.info(f"Processed: {processor.to_dict()}")
+        logger.info(f"Processed: {processor.input_file} => {processor.output_file}")

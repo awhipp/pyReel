@@ -23,7 +23,7 @@ class ScanDirectory(BaseModel):
     root_dir: str
     files: list[FileMetadata] = []
 
-    def __init__(self, root_dir: str):
+    def __init__(self, root_dir: str = os.getenv("ROOT_DIR", ".")):
         """Post-initialization to set up additional attributes."""
         super().__init__(root_dir=root_dir)
         self.scan_directory()
@@ -46,16 +46,3 @@ class ScanDirectory(BaseModel):
                         initial_size=file_size,
                     )
                 )
-
-    # To string
-    def __str__(self):
-        str_rep: str = f"Scanning directory: {self.root_dir}"
-        for idx, file in enumerate(self.files):
-            str_rep += f"\n{idx + 1}. {file}"
-        
-        return str_rep
-
-if __name__ == "__main__":
-    # Scan the directory and print the files and metadata
-    scanner = ScanDirectory(root_dir=".")
-    print(scanner)

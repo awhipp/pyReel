@@ -9,7 +9,6 @@ import logging
 import ffmpeg
 
 from pydantic import BaseModel
-from models import FileMetadata
 
 # Set up logging to add timestamps to the output
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
@@ -17,9 +16,11 @@ logger = logging.getLogger(__name__)
 
 class VideoProcessor(BaseModel):
     input_file: str
-    input_size: int = 0
     output_file: str = ""
+
+    input_size: int = 0
     output_size: int = 0
+
     processed: bool = False
     converted: bool = False
 
@@ -61,12 +62,10 @@ class VideoProcessor(BaseModel):
             os.rename(self.output_file, new_output_file)
             self.output_file = new_output_file
             print(f"Replaced {self.input_file} with the smaller {self.output_file}")
-            self.processed = True
             self.converted = True
         else:
             os.remove(self.output_file)
             print(f"Retained original {self.input_file}, new file {self.output_file} is not smaller")
-            self.processed = True
 
     def process(self):
         """Converts the video file to H.265 format and replaces the original file if the new file is smaller.
@@ -77,6 +76,7 @@ class VideoProcessor(BaseModel):
         try:
             if self.convert_to_h265():
                 self.compare_and_replace()
+                self.processed = True
             else:
                 if os.path.exists(self.output_file):
                     os.remove(self.output_file)

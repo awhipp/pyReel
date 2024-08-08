@@ -1,58 +1,57 @@
 """Service to scan a directory and store file metadata in a SQLite database."""
 
+# ! TODO: Add fast api to run these various functions
+# ! TODO: Add tests for the various modules
+
 import os
 
-from db import Connector
-from scan import ScanDirectory
 from models import FileMetadata
+from scan import ScanDirectory
 from convert import VideoProcessor
 
-# Create a connector object
-connector = Connector("files.db")
+# Initialize Tables
+FileMetadata.create_tables()
 
-# Add files to the database
-scanner = ScanDirectory(root_dir=".")
-for file in scanner.files:
-    connector.add_file_metadata_if_not_exists(file)
+# Check for deleted files
+files = FileMetadata.get_all_files()
+for file in files:
+    if not os.path.exists(file.file_path):
+        file.deleted = True
+        file.save()
 
-# Optimize
-connector.optimize_and_vacuum()
+# Scan the directory
+scan = ScanDirectory()
 
-# Get all files from the database
-files: list[FileMetadata] = connector.get_all_files()
-for f in files:
-    # Check if file still exists
-    if not os.path.exists(f.file_path):
-        print(f"{f.file_name} no longer exists.")
-        connector.set_file_deleted(f.file_path)
+# Save the files to the database
+for file in scan.files:
+    if FileMetadata.check_if_file_exists(file.file_path):
         continue
 
-    if connector.is_file_converted(f.file_path):
-        print(f"{f.file_name} is already converted.")
-        continue
+    file.save()
 
-    print(f"{f.file_name} is not converted.")
-    # Convert the file
-    process = VideoProcessor(f.file_path)
-    process.process()
+# Print the files
+files = FileMetadata.get_all_files()
+for file in files:
 
-    print(process)
+    print(file)
 
-    if process.converted:
-        connector.update_file_path(old_file_path=process.input_file, new_file_path=process.output_file)
-        connector.update_file_size(process.output_file, process.output_size)
-        connector.set_file_converted(process.output_file, converted=process.processed)
-    else:
-        connector.set_file_converted(process.input_file, converted=process.processed)
+print("\nProcessing files...\n")
+# Process the files
+files = FileMetadata.get_files_by_converted_status(converted=False)
+for file in files:
+    processor = VideoProcessor(input_file=file.file_path)
+    processor.process()
 
-# Stats
-print(f"Total files: {connector.file_count()}")
-print(f"Total size saved: {connector.file_size_saved()} bytes")
-print(f"Percentage saved: {connector.percentage_saved()}%")
+    file.processed = processor.processed
+    file.converted = processor.converted
 
-files: list[FileMetadata] = connector.get_all_files()
-for f in files:
-    print(f)
+    if file.converted:
+        file.file_path = processor.output_file
+        file.file_name = os.path.basename(file.file_path)
 
-# Close the connection
-connector.close()
+    file.save()
+
+# Print the files
+files = FileMetadata.get_all_files()
+for file in files:
+    print(file)

@@ -44,6 +44,11 @@ For other operating systems, please refer to the official ffmpeg installation gu
 2. Ensure ffmpeg is installed and accessible from the command line.
 3. Run the script using Python.
 
+### Environment Variables
+
+* `ROOT_DIR` - The root directory to scan for media files. Default is the current directory.
+* `SQLITE_DB` - The SQLite database file to store the conversion results. Default is `files.db`.
+
 ### Example
 
 ```sh

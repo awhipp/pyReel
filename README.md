@@ -1,6 +1,6 @@
 # pyThor
 
-pyThor is a Python CLI and service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file.
+pyThor is a Python service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file.
 
 Name was a happy accident when typing python when writing the README, and therefore the name stuck.
 
@@ -49,7 +49,20 @@ For other operating systems, please refer to the official ffmpeg installation gu
 * `ROOT_DIR` - The root directory to scan for media files. Default is the current directory.
 * `SQLITE_DB` - The SQLite database file to store the conversion results. Default is `files.db`.
 
-### Example
+### Development
+
+#### Pre-commit and Githooks
+
+[![Pre-commit Checks](https://github.com/awhipp/pyThor/actions/workflows/pre-commit-check.yml/badge.svg)](https://github.com/awhipp/pyThor/actions/workflows/pre-commit-check.yml)
+
+Installing pre-commit and running the hooks
+
+```sh
+pre-commit install
+pre-commit run --all-files
+```
+
+#### Running the FastAPI service locally
 
 ```sh
 poetry install

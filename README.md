@@ -12,9 +12,9 @@ This service uses `ffmpeg` to perform media file conversions to H.265 format, wh
 
 * Converts media files to H.265 format.
 * Only keeps the video if the output file is smaller than the input file.
-* Runs as a service (TBD)
+* Runs as an API service
 * Fully configurable (TBD)
-* Scans nested directories for media files (TBD)
+* Scans nested directories for media files
 
 ## Prerequisites
 
@@ -54,5 +54,5 @@ For other operating systems, please refer to the official ffmpeg installation gu
 ```sh
 poetry install
 poetry shell
-python convert.py input.mp4
+uvicorn app:app --reload
 ```

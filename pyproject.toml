@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "pyThor"
+name = "pyReel"
 version = "0.1.0"
-description = "pyThor is a Python CLI and service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file."
+description = "pyReel is a Python service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file."
 authors = ["awhipp"]
 license = "MIT"
 
@@ -14,6 +14,7 @@ fastapi = "^0.112.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.8.0"
+pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

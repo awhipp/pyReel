@@ -71,6 +71,7 @@ class VideoProcessor(BaseModel):
                 f"Retained original {self.input_file},"
                 "new file {self.output_file} is not smaller",
             )
+            self.converted = False
 
     def process(self):
         """Converts the video file to H.265 format and

@@ -3,3 +3,7 @@
 *.pyc
 *.mkv
 *.avi
+.coverage
+coverage.xml
+
+__pycache__/

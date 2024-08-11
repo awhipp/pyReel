@@ -4,8 +4,6 @@
 
 pyReel is a Python service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file.
 
-Name was a happy accident when typing python when writing the README, and therefore the name stuck.
-
 ## R.E.E.L.: Rapid & Efficient Encoding Library
 
 This service uses `ffmpeg` to perform media file conversions to H.265 format, which is more efficient than H.264. The script takes a media file as input and converts it to H.265 format with the same resolution and frame rate.

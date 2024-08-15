@@ -4,7 +4,6 @@ import mimetypes
 import os
 
 from pydantic import BaseModel
-
 from utils.logger import get_logger
 from utils.models import FileMetadata
 

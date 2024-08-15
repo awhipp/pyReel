@@ -10,12 +10,11 @@ Routes:
 
 import os
 import time
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-
 from utils.convert import VideoProcessor
 from utils.logger import get_logger
 from utils.models import FileMetadata
@@ -23,12 +22,28 @@ from utils.scan import ScanDirectory
 
 logger = get_logger(__name__)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Context manager to handle the lifespan of the application."""
+
+    # Initialize tables as needed
+    FileMetadata.create_tables()
+
+    # Run application
+    yield
+
+    # Clean up any resources
+    logger.debug("Shutting down the application.")
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 # Logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+    """Log the request and response of the API."""
     logger.debug(f"Request: {request.method} {request.url}")
     start_time = time.time()
 
@@ -143,7 +158,3 @@ def process_single_file(file_path: FilePath):
 
     file.save()
     return {"message": f"File {file.file_path} processed."}
-
-
-# Mount the static files directory
-app.mount("/", StaticFiles(directory="ui", html=True), name="static")

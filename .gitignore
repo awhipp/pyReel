@@ -3,7 +3,9 @@
 *.pyc
 *.mkv
 *.avi
+
 .coverage
 coverage.xml
 
+.pytest_cache/
 __pycache__/

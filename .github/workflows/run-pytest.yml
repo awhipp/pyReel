@@ -17,8 +17,8 @@ jobs:
         python-version: '3.10'
 
     - name: Install and Configure poetry
+      working-directory: ./api
       run: |
-        cd /api
         python -m pip install poetry==1.8.2
         python -m poetry config virtualenvs.in-project true
 
@@ -26,14 +26,14 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ./api/.venv
-        key: ${{ runner.os }}-venv-${{ hashFiles('**/api/poetry.lock') }}
+        key: ${{ runner.os }}-venv-${{ hashFiles('**./api/poetry.lock') }}
 
     - name: Install dependencies
+      working-directory: ./api
       run: |
-        cd /api
         python -m poetry install
 
     - name: Run tests
+      working-directory: ./api
       run: |
-        cd /api
         python -m poetry run python -m pytest --disable-warnings -xv --cov=. --cov-report=xml

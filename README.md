@@ -6,7 +6,7 @@ pyReel is a Python service that converts media files to H.265 format. It uses `f
 
 ## CI/CD
 
-[![Python Tests](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml) [![Pre-commit Checks](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml)
+[![Python Tests](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml) [![Pre-commit Checks](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml) [![CodeQL](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql)
 
 ## Features
 
@@ -90,4 +90,13 @@ cd /api
 poetry install
 poetry shell
 uvicorn app:app --reload
+```
+
+### Testing Backend
+
+To run the tests, run the following command:
+
+```sh
+cd /api
+pytest
 ```

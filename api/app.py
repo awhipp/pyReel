@@ -67,10 +67,16 @@ app.add_middleware(
 )
 
 
-class FilePath(BaseModel):
-    """Model for a file path."""
+class ProcessSingleFileRequest(BaseModel):
+    """Model for a single file to process."""
 
     file_path: str
+
+
+class ProcessScanRequest(BaseModel):
+    """Model for a directory to scan."""
+
+    directory: str
 
 
 @app.get("/files", response_model=list[FileMetadata])
@@ -107,9 +113,10 @@ def check_file_status():
 
 
 @app.post("/files/scan")
-def scan_and_save_files(directory: str = os.getenv("ROOT_DIR", ".")):
+def scan_and_save_files(request: ProcessScanRequest):
     """Scan the directory and save new files."""
-    scan = ScanDirectory(directory)
+    logger.info(f"Scanning directory: {request}")
+    scan = ScanDirectory(request.directory)
 
     # Save the files to the database
     for file in scan.files:
@@ -140,9 +147,9 @@ def process_unconverted_files():
 
 
 @app.post("/files/process/single")
-def process_single_file(file_path: FilePath):
+def process_single_file(request: ProcessSingleFileRequest):
     """Process a single file based on its path."""
-    file = FileMetadata.get_file_by_path(file_path.file_path)
+    file = FileMetadata.get_file_by_path(request.file_path)
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
 

@@ -1,7 +1,6 @@
 """ Fixtures for the tests. """
 
 import pytest
-
 from utils.convert import VideoProcessor
 
 

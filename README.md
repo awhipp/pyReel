@@ -16,18 +16,45 @@ pyReel is a Python service that converts media files to H.265 format. It uses `f
 * Fully configurable (TBD)
 * Scans nested directories for media files
 
-## Prerequisites
+## Frontend
 
-- Python 3.x
-- `ffmpeg` installed on your system
+The frontend is a React application that allows users to manage and convert media files. It uses the backend service to perform the conversion.
 
-## Installation
+### Frontend Pre-requisites
 
-### Installing Python
+Before you begin, ensure you have met the following requirements:
+
+* Installed Node.js and npm
+
+#### node and npm
+
+If you don't have node and npm installed, you can download it from [nodejs.org](https://nodejs.org/en/download/package-manager/current).
+
+
+### Setup Frontend Locally
+
+```sh
+cd ui/
+npm install
+npm run start
+```
+
+## Backend
+
+The backend is a FastAPI service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file.
+
+### Backend Pre-requisites
+
+Before you begin, ensure you have met the following requirements:
+
+* Installed Python 3.10+
+* Installed `ffmpeg`
+
+#### Python 3.10+
 
 If you don't have Python installed, you can download it from [python.org](https://www.python.org/downloads/).
 
-### Installing ffmpeg
+#### ffmpeg
 
 On a Linux machine, you can install `ffmpeg` using the following command:
 
@@ -38,18 +65,14 @@ sudo apt-get install ffmpeg
 
 For other operating systems, please refer to the official ffmpeg installation guide.
 
-## Usage
+### Setup Backend Locally
 
-1. Clone the repository or download the convert.py script.
-2. Ensure ffmpeg is installed and accessible from the command line.
-3. Run the script using Python.
+Once prereqs are installed, you can begin setting up the project.
 
-### Environment Variables
+#### Environment Variables
 
 * `ROOT_DIR` - The root directory to scan for media files. Default is the current directory.
 * `SQLITE_DB` - The SQLite database file to store the conversion results. Default is `files.db`.
-
-### Development
 
 #### Pre-commit and Githooks
 
@@ -60,9 +83,10 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-#### Running the FastAPI service locally
+#### Running the backend service locally
 
 ```sh
+cd /api
 poetry install
 poetry shell
 uvicorn app:app --reload

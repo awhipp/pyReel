@@ -3,7 +3,6 @@
 import uuid
 
 from pydantic import BaseModel
-
 from utils.db import Connector
 from utils.logger import get_logger
 

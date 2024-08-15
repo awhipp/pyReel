@@ -7,10 +7,6 @@ jobs:
   run-pytest:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: /api
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -22,17 +18,22 @@ jobs:
 
     - name: Install and Configure poetry
       run: |
+        cd /api
         python -m pip install poetry==1.8.2
         python -m poetry config virtualenvs.in-project true
 
     - name: Cache the virtualenv
       uses: actions/cache@v4
       with:
-        path: ./.venv
-        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
+        path: ./api/.venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/api/poetry.lock') }}
 
     - name: Install dependencies
-      run: python -m poetry install
+      run: |
+        cd /api
+        python -m poetry install
 
     - name: Run tests
-      run: python -m poetry run python -m pytest --disable-warnings -xv --cov=. --cov-report=xml
+      run: |
+        cd /api
+        python -m poetry run python -m pytest --disable-warnings -xv --cov=. --cov-report=xml

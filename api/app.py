@@ -119,7 +119,7 @@ def scan_and_save_files(request: ProcessScanRequest):
     scan = ScanDirectory(request.directory)
 
     # Save the files to the database
-    for file in scan.files:
+    for file in scan.get_files():
         if FileMetadata.check_if_file_exists(file.file_path):
             continue
         file.save()

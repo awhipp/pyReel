@@ -1,6 +1,6 @@
 """This module contains the class definition for the various models used in the application."""
 
-import uuid
+import hashlib
 
 from pydantic import BaseModel
 from utils.db import Connector
@@ -15,7 +15,7 @@ db = Connector()
 class FileMetadata(BaseModel):
     """Representation of a file's metadata."""
 
-    file_id: str = str(uuid.uuid4())
+    file_id: str
     file_name: str
     file_path: str
     initial_size: int
@@ -27,6 +27,7 @@ class FileMetadata(BaseModel):
     def __init__(self, **data):
         """Post-initialization to set up additional attributes."""
         data["current_size"] = data.get("initial_size", 0)
+        data["file_id"] = hashlib.sha256(data["file_path"].encode()).hexdigest()
         super().__init__(**data)
 
     def __str__(self) -> str:

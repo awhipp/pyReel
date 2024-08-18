@@ -27,12 +27,16 @@ class ScanDirectory(BaseModel):
     """
 
     root_dir: str
-    files: list[FileMetadata] = []
+    files: dict[str, FileMetadata] = {}
 
     def __init__(self, root_dir: str = os.getenv("ROOT_DIR", ".")):
         """Post-initialization to set up additional attributes."""
         super().__init__(root_dir=root_dir)
         self.scan_directory()
+
+    def get_files(self) -> list[FileMetadata]:
+        """Return the list of files."""
+        return list(self.files.values())
 
     def scan_directory(self):
         """Scans the directory and returns a list of files and metadata."""
@@ -46,11 +50,15 @@ class ScanDirectory(BaseModel):
                     continue
 
                 file_size = os.path.getsize(file_path)
-                self.files.append(
-                    FileMetadata(
-                        file_name=file_name,
-                        file_path=file_path,
-                        initial_size=file_size,
-                    ),
+                file_metadata = FileMetadata(
+                    file_name=file_name,
+                    file_path=file_path,
+                    initial_size=file_size,
                 )
+
+                if file_metadata.file_id in self.files:
+                    logger.debug(f"File already exists: {file_path} -- Updating...")
+
+                self.files[file_metadata.file_id] = file_metadata
+
                 logger.debug(f"Found file: {file_path}")

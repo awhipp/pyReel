@@ -72,7 +72,7 @@ Once prereqs are installed, you can begin setting up the project.
 #### Environment Variables
 
 * `ROOT_DIR` - The root directory to scan for media files. Default is the current directory.
-* `SQLITE_DB` - The SQLite database file to store the conversion results. Default is `files.db`.
+* `SQLITE_DB` - The SQLite database file to store the conversion results. Default is `pyreel.db`.
 
 #### Pre-commit and Githooks
 

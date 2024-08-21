@@ -19,7 +19,7 @@ class Connector:
     conn: sqlite3.Connection
     cursor: sqlite3.Cursor
 
-    def __new__(cls, db_path: str = os.getenv("SQLITE_DB", "files.db")):
+    def __new__(cls, db_path: str = os.getenv("SQLITE_DB", "pyreel.db")):
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:

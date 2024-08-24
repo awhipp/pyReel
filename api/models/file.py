@@ -39,7 +39,7 @@ class FileMetadata(BaseModel):
 
     def save(self):
         """Save the file metadata to the database, and on conflict, update the existing record."""
-        db.cursor.execute(
+        db.execute(
             """
             INSERT OR REPLACE INTO files (
                 file_id, file_name, file_path, initial_size,
@@ -59,12 +59,11 @@ class FileMetadata(BaseModel):
             ),
         )
         logger.info(f"Saved file metadata: {self.file_path}")
-        db.conn.commit()
 
     @staticmethod
     def check_if_file_exists(file_path: str) -> bool:
         """Checks if the file exists in the database."""
-        db.cursor.execute(
+        cursor = db.execute(
             """
             SELECT COUNT(*)
             FROM files
@@ -72,7 +71,7 @@ class FileMetadata(BaseModel):
             """,
             (file_path,),
         )
-        count = db.cursor.fetchone()[0]
+        count = cursor.fetchone()[0]
         does_exist = count > 0
         logger.info(f"File exists: {file_path} => {does_exist}")
         return does_exist
@@ -80,7 +79,7 @@ class FileMetadata(BaseModel):
     @staticmethod
     def get_file_by_path(file_path: str):
         """Returns the file metadata by the file path."""
-        db.cursor.execute(
+        cursor = db.execute(
             """
             SELECT *
             FROM files
@@ -88,11 +87,11 @@ class FileMetadata(BaseModel):
             """,
             (file_path,),
         )
-        row = db.cursor.fetchone()
+        row = cursor.fetchone()
         if row:
             logger.info(f"Found file by path: {file_path}")
             return FileMetadata(
-                **dict(zip([column[0] for column in db.cursor.description], row)),
+                **dict(zip([column[0] for column in cursor.description], row)),
             )
         logger.info(f"File not found by path: {file_path}")
         return None
@@ -100,12 +99,12 @@ class FileMetadata(BaseModel):
     @staticmethod
     def get_all_files():
         """Returns all the files from the database."""
-        db.cursor.execute("SELECT * FROM files")
-        rows = db.cursor.fetchall()
+        cursor = db.execute("SELECT * FROM files")
+        rows = cursor.fetchall()
         # Convert the rows to FileMetadata objects (using column names)
         rows = [
             FileMetadata(
-                **dict(zip([column[0] for column in db.cursor.description], row)),
+                **dict(zip([column[0] for column in cursor.description], row)),
             )
             for row in rows
         ]
@@ -114,7 +113,7 @@ class FileMetadata(BaseModel):
     @staticmethod
     def get_files_by_converted_status(converted: bool, deleted: bool = False):
         """Returns the files based on the converted status."""
-        db.cursor.execute(
+        cursor = db.execute(
             """
             SELECT *
             FROM files
@@ -123,11 +122,11 @@ class FileMetadata(BaseModel):
             """,
             (converted, deleted),
         )
-        rows = db.cursor.fetchall()
+        rows = cursor.fetchall()
         # Convert the rows to FileMetadata objects (using column names)
         rows = [
             FileMetadata(
-                **dict(zip([column[0] for column in db.cursor.description], row)),
+                **dict(zip([column[0] for column in cursor.description], row)),
             )
             for row in rows
         ]
@@ -137,7 +136,7 @@ class FileMetadata(BaseModel):
     @staticmethod
     def get_files_by_processed_status(processed: bool, deleted: bool = False):
         """Returns the files based on the processed status."""
-        db.cursor.execute(
+        cursor = db.execute(
             """
             SELECT *
             FROM files
@@ -146,11 +145,11 @@ class FileMetadata(BaseModel):
             """,
             (processed, deleted),
         )
-        rows = db.cursor.fetchall()
+        rows = cursor.fetchall()
         # Convert the rows to FileMetadata objects (using column names)
         rows = [
             FileMetadata(
-                **dict(zip([column[0] for column in db.cursor.description], row)),
+                **dict(zip([column[0] for column in cursor.description], row)),
             )
             for row in rows
         ]
@@ -160,16 +159,16 @@ class FileMetadata(BaseModel):
     @staticmethod
     def get_count():
         """Returns the number of files in the database."""
-        db.cursor.execute("SELECT COUNT(1) FROM files")
-        count = db.cursor.fetchone()[0]
+        cursor = db.execute("SELECT COUNT(1) FROM files")
+        count = cursor.fetchone()[0]
         logger.info(f"Total files in the database: {count}")
         return count
 
     @staticmethod
     def file_size_saved():
         """Returns the total file size saved by the conversion."""
-        db.cursor.execute("SELECT SUM(initial_size - current_size) FROM files")
-        saved = db.cursor.fetchone()[0]
+        cursor = db.execute("SELECT SUM(initial_size - current_size) FROM files")
+        saved = cursor.fetchone()[0]
         logger.info(f"Total space saved: {saved}")
         return saved
 
@@ -177,8 +176,8 @@ class FileMetadata(BaseModel):
     def percentage_saved():
         """Returns the percentage of space saved by the conversion."""
         saved = FileMetadata.file_size_saved()
-        db.cursor.execute("SELECT SUM(initial_size) FROM files")
-        total = db.cursor.fetchone()[0]
+        cursor = db.execute("SELECT SUM(initial_size) FROM files")
+        total = cursor.fetchone()[0]
         logger.info(f"Percentage space saved: {(saved / total) * 100}")
         return (saved / total) * 100
 
@@ -204,6 +203,5 @@ class FileMetadata(BaseModel):
         # Set file_id as the primary key
         ddl = ddl.replace("file_id string", "file_id string PRIMARY KEY")
 
-        db.cursor.execute(ddl)
+        db.execute(ddl)
         logger.info("Created tables for FileMetadata")
-        db.conn.commit()

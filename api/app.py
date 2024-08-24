@@ -17,8 +17,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from utils.convert import VideoProcessor
 from utils.logger import get_logger
-from utils.models import FileMetadata
 from utils.scan import ScanDirectory
+
+from api.models.file import FileMetadata
 
 logger = get_logger(__name__)
 

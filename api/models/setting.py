@@ -25,9 +25,9 @@ class Setting(BaseModel):
 
     def save(self):
         """Save the file metadata to the database, and on conflict, update the existing record."""
-        db.cursor.execute(
+        db.execute(
             """
-            INSERT OR REPLACE INTO files (
+            INSERT OR REPLACE INTO settings (
                 key, value
             )
             VALUES (?, ?)
@@ -38,13 +38,16 @@ class Setting(BaseModel):
             ),
         )
         logger.info(f"Saved Setting: {self.key}")
-        db.conn.commit()
 
     @staticmethod
     def get_settings():
-        """Return all the settings as a dictionary."""
-        db.cursor.execute("SELECT * FROM settings")
-        return db.cursor.fetchall()
+        """Return all the settings as a list of dict."""
+        cursor = db.execute("SELECT * FROM settings")
+        values = cursor.fetchall()
+        settings = []
+        for value in values:
+            settings.append({"key": value[0], "value": value[1]})
+        return settings
 
     @staticmethod
     def create_tables():
@@ -54,7 +57,7 @@ class Setting(BaseModel):
         schema = Setting.model_json_schema()
 
         ddl: str = f"""
-        CREATE TABLE IF NOT EXISTS abc (
+        CREATE TABLE IF NOT EXISTS settings (
             {', '.join(
                     [
                         f"{column} {schema['properties'][column]['type']}"
@@ -68,6 +71,5 @@ class Setting(BaseModel):
         # Set file_id as the primary key
         ddl = ddl.replace("key string", "key string PRIMARY KEY")
 
-        db.cursor.execute(ddl)
+        db.execute(ddl)
         logger.info("Created tables for settings")
-        db.conn.commit()

@@ -7,6 +7,17 @@ import cv2
 import numpy as np
 import pytest
 from utils.convert import VideoProcessor
+from utils.db import Connector
+
+
+@pytest.fixture(autouse=True)
+def emphemeral_db():
+    """Create a temporary database for the tests."""
+    # Create a temporary database
+    db = Connector()
+    yield db
+    # Close the database connection
+    db.close()
 
 
 def create_black_video(filepath, duration=5, fps=30, width=640, height=480):

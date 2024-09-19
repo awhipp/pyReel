@@ -40,7 +40,7 @@ class Setting(BaseModel):
         logger.info(f"Saved Setting: {self.key}")
 
     @staticmethod
-    def get_settings():
+    def get_settings() -> list[dict]:
         """Return all the settings as a list of dict."""
         cursor = db.execute("SELECT * FROM settings")
         values = cursor.fetchall()

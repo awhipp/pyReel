@@ -6,7 +6,13 @@ pyReel is a Python service that converts media files to H.265 format. It uses `f
 
 ## CI/CD
 
-[![Python Tests](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/run-pytest.yml) [![Pre-commit Checks](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml) [![CodeQL](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql)
+[![UI / Node Tests](https://github.com/awhipp/pyReel/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/ui-tests.yml)
+
+[![API / Python Tests](https://github.com/awhipp/pyReel/actions/workflows/api-tests.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/api-tests.yml)
+
+[![Pre-commit Checks](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/pre-commit-check.yml)
+
+[![CodeQL](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/awhipp/pyReel/actions/workflows/github-code-scanning/codeql)
 
 ## Features
 
@@ -16,20 +22,22 @@ pyReel is a Python service that converts media files to H.265 format. It uses `f
 * Fully configurable (TBD)
 * Scans nested directories for media files
 
+## Pre-requisites
+
+### Mandatory
+
+* Node 22 (LTS)
+* Python 3.10^
+* ffmpeg
+* poetry
+
+### Recommended
+
+* Precommit
+
 ## Frontend
 
 The frontend is a React application that allows users to manage and convert media files. It uses the backend service to perform the conversion.
-
-### Frontend Pre-requisites
-
-Before you begin, ensure you have met the following requirements:
-
-* Installed Node.js and npm
-
-#### node and npm
-
-If you don't have node and npm installed, you can download it from [nodejs.org](https://nodejs.org/en/download/package-manager/current).
-
 
 ### Setup Frontend Locally
 
@@ -42,28 +50,6 @@ npm run start
 ## Backend
 
 The backend is a FastAPI service that converts media files to H.265 format. It uses `ffmpeg` to perform the conversion and only keeps the video if the output file is smaller than the input file.
-
-### Backend Pre-requisites
-
-Before you begin, ensure you have met the following requirements:
-
-* Installed Python 3.10+
-* Installed `ffmpeg`
-
-#### Python 3.10+
-
-If you don't have Python installed, you can download it from [python.org](https://www.python.org/downloads/).
-
-#### ffmpeg
-
-On a Linux machine, you can install `ffmpeg` using the following command:
-
-```sh
-sudo apt-get update
-sudo apt-get install ffmpeg
-```
-
-For other operating systems, please refer to the official ffmpeg installation guide.
 
 ### Setup Backend Locally
 

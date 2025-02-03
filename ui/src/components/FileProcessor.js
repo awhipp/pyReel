@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const FileProcessor = () => {
-  const [output, setOutput] = useState('');
+  const [output, setOutput] = useState("");
 
-  const apiUrl = 'http://localhost:8000';
+  const apiUrl = "http://localhost:8000";
 
   const getAllFiles = async () => {
     const response = await fetch(`${apiUrl}/files`);
@@ -20,11 +20,11 @@ const FileProcessor = () => {
   const scanAndSaveFiles = async () => {
     const directory = prompt("Enter directory path to scan:");
     const response = await fetch(`${apiUrl}/files/scan`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ directory })
+      body: JSON.stringify({ directory }),
     });
     const data = await response.json();
     setOutput(JSON.stringify(data, null, 2));
@@ -39,11 +39,11 @@ const FileProcessor = () => {
   const processSingleFile = async () => {
     const filePath = prompt("Enter file path to process:");
     const response = await fetch(`${apiUrl}/files/process-single`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ filePath })
+      body: JSON.stringify({ filePath }),
     });
     const data = await response.json();
     setOutput(JSON.stringify(data, null, 2));
@@ -55,7 +55,9 @@ const FileProcessor = () => {
       <button onClick={getAllFiles}>Get All Files</button>
       <button onClick={checkFiles}>Check Existing Files</button>
       <button onClick={scanAndSaveFiles}>Scan and Save Files</button>
-      <button onClick={processUnconvertedFiles}>Process Unconverted Files</button>
+      <button onClick={processUnconvertedFiles}>
+        Process Unconverted Files
+      </button>
       <button onClick={processSingleFile}>Process Single File</button>
       <div id="output">
         <pre>{output}</pre>

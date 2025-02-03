@@ -1,0 +1,33 @@
+name: UI Tests
+
+on: [push, pull_request]
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: Cache node modules
+      uses: actions/cache@v4
+      with:
+        path: ui/node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/ui/package-lock.json') }}
+
+    - name: Install dependencies
+      working-directory: ./ui
+      run: |
+        npm install
+
+    # Uncomment the following lines if you have tests to run
+    # - name: Run tests
+    #   working-directory: ./ui
+    #   run: |
+    #     npm test

@@ -2,7 +2,7 @@
     "python.testing.pytestArgs": [
         "api/tests"
     ],
-    "python.pythonPath": "./api/.venv/bin/python3",
+    "python.defaultInterpreterPath": "api/.venv/Scripts/python",
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "cSpell.words": [

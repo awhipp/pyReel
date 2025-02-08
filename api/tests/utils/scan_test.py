@@ -1,5 +1,7 @@
 """Testing the scan method."""
 
+import os
+
 from utils.scan import ScanDirectory
 
 
@@ -18,7 +20,7 @@ def test_scan_directory(generate_test_files):
     # Check if the files are video files
     for file in scan.get_files():
         assert file.file_path in generated_files
-        assert file.file_name in [f.split("/")[-1] for f in generated_files]
+        assert file.file_name in [f.split(os.sep)[-1] for f in generated_files]
         assert file.initial_size > 0
         assert file.initial_size is not None
         assert file.file_path.endswith(".mp4")
